@@ -41,7 +41,7 @@ const getItems = function() {
                 if (dateTraded <= dateThreshold) {
                     newRow.children[2].innerHTML = '<span class="oldish-price" title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="oldman">👴</span></span>';
                 } else {
-                    newRow.children[2].innerHTML = parseInt(oldishPirce).toLocaleString() + '<span class="coin">●</span>';
+                    newRow.children[2].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="coin">●</span></span>';
                 }
             } else if (rselydata[itemid].elyprices.length > 0) {
                 totalprice=0
@@ -50,7 +50,7 @@ const getItems = function() {
                 }
                 let avgprice=totalprice / rselydata[itemid].elyprices.length;
                 newRow.children[2].dataset.value = avgprice;
-                newRow.children[2].innerHTML = parseInt(avgprice).toLocaleString() + '<span class="coin">●</span>';
+                newRow.children[2].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
             } else {
                 newRow.children[2].dataset.value = 0;
             }
