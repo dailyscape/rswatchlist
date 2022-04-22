@@ -1,4 +1,5 @@
-let combinedData = [];
+const storage = window.localStorage;
+var combinedData = [];
 
 const combineSortData = function() {
     //combine
@@ -11,11 +12,20 @@ const combineSortData = function() {
             rselydata[itemid].elyavgprice = totalprice / rselydata[itemid].elyprices.length;
         }
 
-        combinedData.push(Object.assign({"id": itemid}, rsapidata[itemid], rselydata[itemid]));
+        let isFav = storage.getItem('fav-' + itemid) ?? 'false';
+
+        combinedData.push(Object.assign({"id": itemid, "fav": isFav}, rsapidata[itemid], rselydata[itemid]));
     }
 
-    //default sort
+    //default sort - uses ely price or ge price
+    //@todo maybe account for old ely data too?
     combinedData.sort((a, b) => {
+        if (a.fav == 'true' && b.fav == 'false') {
+            return -1;
+        } else if (b.fav == 'true' && a.fav == 'false') {
+            return 1;
+        }
+
         let sortPriceA = (a.price > 0 && "elyavgprice" in a && a.elyavgprice > 0) ? a.elyavgprice : a.price;
         let sortPriceB = (b.price > 0 && "elyavgprice" in b && b.elyavgprice > 0) ? b.elyavgprice : b.price;
         let sortSolution = sortPriceB - sortPriceA;
@@ -32,9 +42,15 @@ const getItems = function() {
     let lazyloadCount = 0;
     for (let i in combinedData) {
         let itemid = combinedData[i].id;
+
         if (itemid in rsapidata || (itemid in rselydata && rselydata[itemid].elyprices.length > 0)) {
             let rowClone = sampleRow.content.cloneNode(true);
             let newRow = rowClone.querySelector('tr');
+
+            let isFav = storage.getItem('fav-' + itemid) ?? 'false';
+            if (isFav !== 'false') {
+                newRow.dataset.fav = 'true';
+            }
 
             let elyLink = (itemid in rselydata) ? '<a href="https://www.ely.gg/search?search_item=' + rselydata[itemid].elyname + '" target="_blank" rel=\"noreferrer noopener\">' : '';
             let displayName = '';
@@ -42,20 +58,20 @@ const getItems = function() {
             newRow.dataset.id = itemid;
 
             if (itemid in rsapidata) {
-                newRow.children[1].dataset.value = rsapidata[itemid].price;
-                newRow.children[1].innerHTML = rsapidata[itemid].price.toLocaleString() + '<span class="coin">●</span>';
+                newRow.children[2].dataset.value = rsapidata[itemid].price;
+                newRow.children[2].innerHTML = rsapidata[itemid].price.toLocaleString() + '<span class="coin">●</span>';
                 displayName = rsapidata[itemid].name;
                 let wikinamelink = rsapidata[itemid].name.toLowerCase().replace(/\s+/g, '_');
                 wikinamelink = wikinamelink.charAt(0).toUpperCase() + wikinamelink.slice(1);
                 wikiLink = '<a href="https://runescape.wiki/w/' + wikinamelink + '" target="_blank" rel=\"noreferrer noopener\">';
             } else {
-                newRow.children[1].dataset.value = 0;
+                newRow.children[2].dataset.value = 0;
                 displayName = rselydata[itemid].elyname;
             }
 
             let lazyloadHtml = (lazyloadCount > lazyloadAfter) ? ' loading="lazy"' : 'loading="eager"';
 
-            newRow.children[0].innerHTML = wikiLink + '<img class="item_icon" src="/rsdata/images/' + itemid + '.gif" ' + lazyloadHtml +'></a> ' + elyLink + displayName + '</a>';
+            newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/rsdata/images/' + itemid + '.gif" ' + lazyloadHtml +'></a> ' + elyLink + displayName + '</a>';
             // 📖
             // 📈
 
@@ -64,11 +80,11 @@ const getItems = function() {
                 dateThreshold.setMonth(dateThreshold.getMonth() - 2);
                 let dateTraded=new Date(rselydata[itemid].elyprices[0].date);
                 let oldishPirce = rselydata[itemid].elyprices[0].price;
-                newRow.children[2].dataset.value = oldishPirce;
+                newRow.children[3].dataset.value = oldishPirce;
                 if (dateTraded <= dateThreshold) {
-                    newRow.children[2].innerHTML = '<span class="oldish-price" title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="oldman">👴</span></span>';
+                    newRow.children[3].innerHTML = '<span class="oldish-price" title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="oldman">👴</span></span>';
                 } else {
-                    newRow.children[2].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="coin">●</span></span>';
+                    newRow.children[3].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="coin">●</span></span>';
                 }
             } else if (itemid in rselydata && rselydata[itemid].elyprices.length > 0) {
                 totalprice=0
@@ -76,10 +92,10 @@ const getItems = function() {
                     totalprice+=price.price
                 }
                 let avgprice=totalprice / rselydata[itemid].elyprices.length;
-                newRow.children[2].dataset.value = avgprice;
-                newRow.children[2].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
+                newRow.children[3].dataset.value = avgprice;
+                newRow.children[3].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
             } else {
-                newRow.children[2].dataset.value = 0;
+                newRow.children[3].dataset.value = 0;
             }
             tbody.appendChild(newRow);
             lazyloadCount++;
@@ -123,8 +139,27 @@ const makeSortable = function() {
     };
 };
 
+const favEventListeners = function() {
+    let favButtons = document.querySelectorAll('tr.item_row .fav button.fav-btn');
+    for (let favButton of favButtons) {
+        favButton.addEventListener('click', function() {
+            let thisRow = this.closest('tr');
+            let thisItemId = thisRow.dataset.id;
+            let newState = (thisRow.dataset.fav === 'true') ? 'false' : 'true'
+            thisRow.dataset.fav = newState;
+
+            if (newState === 'true') {
+                storage.setItem('fav-' + thisItemId, newState);
+            } else {
+                storage.removeItem('fav-' + thisItemId);
+            }
+        });
+    }
+}
+
 window.onload = function() {
     combineSortData();
     getItems();
     makeSortable();
+    favEventListeners();
 };

@@ -2,6 +2,7 @@ body {
     background:#000;
     color: #c3c3c3;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    line-height: 32px;
 }
 
 th {
@@ -56,8 +57,37 @@ td[data-value] {
     top: -3px;
 }
 
+.fav-btn {
+    cursor: pointer;
+    font-size:1rem;
+    vertical-align: middle;
+}
+
+.btn-secondary.active.fav-on {
+    color: gold;
+}
+
+.item_row[data-fav="true"] .fav-on {
+    display: inline-block;
+    visibility: visibile;
+}
+
+.item_row[data-fav="true"] .fav-off {
+    display: none;
+    visibility: hidden;
+}
+
+.item_row[data-fav="false"] .fav-on {
+    display: none;
+    visibility: hidden;
+}
+
+.item_row[data-fav="false"] .fav-off {
+    display: inline-block;
+    visibility: visibile;
+}
+
 @media (max-width: 767px) {
-    .item_table th,
     .item_table td.item_name {
         width: 50%;
     }
@@ -71,14 +101,12 @@ td[data-value] {
 }
 
 @media (min-width:768px) {
-    .item_table th,
     .item_table td.item_name {
         width: 60%;
     }
 }
 
 @media (min-width:992px) {
-    .item_table th,
     .item_table td.item_name {
         width: 66%;
     }
