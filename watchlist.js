@@ -1,15 +1,42 @@
+let combinedData = [];
+
+const combineSortData = function() {
+    //combine
+    for (let itemid in rsapidata) {
+        if (itemid in rselydata && rselydata[itemid].elyprices.length > 0) {
+            let totalprice=0
+            for (let price of rselydata[itemid].elyprices) {
+                totalprice+=price.price
+            }
+            rselydata[itemid].elyavgprice = totalprice / rselydata[itemid].elyprices.length;
+        }
+
+        combinedData.push(Object.assign({"id": itemid}, rsapidata[itemid], rselydata[itemid]));
+    }
+
+    //default sort
+    combinedData.sort((a, b) => {
+        let sortPriceA = (a.price > 0 && "elyavgprice" in a && a.elyavgprice > 0) ? a.elyavgprice : a.price;
+        let sortPriceB = (b.price > 0 && "elyavgprice" in b && b.elyavgprice > 0) ? b.elyavgprice : b.price;
+        let sortSolution = sortPriceB - sortPriceA;
+
+        return sortSolution;
+    });
+}
+
 const getItems = function() {
     const lazyloadAfter = 30;
     const sampleRow = document.querySelector('#sample_row');
     const table = document.getElementById('item_table');
     const tbody = table.querySelector('tbody');
     let lazyloadCount = 0;
-    for (let itemid in rselydata) {
+    for (let i in combinedData) {
+        let itemid = combinedData[i].id;
         if (itemid in rsapidata || (itemid in rselydata && rselydata[itemid].elyprices.length > 0)) {
             let rowClone = sampleRow.content.cloneNode(true);
             let newRow = rowClone.querySelector('tr');
 
-            let elyLink = '<a href="https://www.ely.gg/search?search_item=' + rselydata[itemid].elyname + '" target="_blank" rel=\"noreferrer noopener\">';
+            let elyLink = (itemid in rselydata) ? '<a href="https://www.ely.gg/search?search_item=' + rselydata[itemid].elyname + '" target="_blank" rel=\"noreferrer noopener\">' : '';
             let displayName = '';
 
             newRow.dataset.id = itemid;
@@ -32,7 +59,7 @@ const getItems = function() {
             // 📖
             // 📈
 
-            if (rselydata[itemid].elyprices.length == 1 ) {
+            if (itemid in rselydata && rselydata[itemid].elyprices.length == 1 ) {
                 let dateThreshold=new Date();
                 dateThreshold.setMonth(dateThreshold.getMonth() - 2);
                 let dateTraded=new Date(rselydata[itemid].elyprices[0].date);
@@ -43,7 +70,7 @@ const getItems = function() {
                 } else {
                     newRow.children[2].innerHTML = '<span title="Last Entry: ' + rselydata[itemid].elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="coin">●</span></span>';
                 }
-            } else if (rselydata[itemid].elyprices.length > 0) {
+            } else if (itemid in rselydata && rselydata[itemid].elyprices.length > 0) {
                 totalprice=0
                 for (let price of rselydata[itemid].elyprices) {
                     totalprice+=price.price
@@ -96,30 +123,8 @@ const makeSortable = function() {
     };
 };
 
-const defaultSort = function() {
-    let defaultSortColumn = 2;
-    let secondarySortColumn = 1;
-
-    const table = document.getElementById('item_table');
-    const tbody = table.querySelector('tbody');
-
-    const tableRows = Array.from(tbody.querySelectorAll('tr'));
-
-    tableRows.sort((a, b) => {
-        let sortSolution = b.children[defaultSortColumn].dataset.value - a.children[defaultSortColumn].dataset.value;
-        if (sortSolution == 0) {
-            sortSolution = b.children[secondarySortColumn].dataset.value - a.children[secondarySortColumn].dataset.value;
-        }
-        return sortSolution;
-    });
-
-    for (let sortedrow of tableRows) {
-        tbody.appendChild(sortedrow);
-    }
-}
-
 window.onload = function() {
+    combineSortData();
     getItems();
     makeSortable();
-    defaultSort();
 };
