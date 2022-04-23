@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Watchlist - RS3 Watchlist Prices Rares</title>
+    <title>Watchlist - RS3 Watchlist Prices Rares - DailyScape</title>
     <link rel="shortcut icon" href="https://dailyscape.github.io/img/dailyscape.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -16,46 +16,80 @@
     <script src="watchlist.js?v=1"></script>
 
     <meta name="title" content="Watchlist">
-    <meta name="description" content="RS3 Watchlist Prices Rares">
+    <meta name="description" content="RS3 Watchlist Prices Rares - DailyScape">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dailyscape.github.io/alch/">
+    <meta property="og:title" content="Watchlist">
+    <meta property="og:description" content="RS3 Watchlist Prices Rares - DailyScape">
+    <meta property="og:image" content="https://dailyscape.github.io/img/dailyscape.png">
+    <meta property="twitter:url" content="https://dailyscape.github.io/alch/">
+    <meta property="twitter:title" content="Watchlist">
+    <meta property="twitter:description" content="RS3 Watchlist Prices Rares - DailyScape">
+    <meta property="twitter:image" content="https://dailyscape.github.io/img/dailyscape.png">
 
     <meta name="theme-color" content="#1f2f38">
 </head>
 <body>
-    <div class="container-xl activity_tables">
-        <!-- <table id="favorite_table" class="item_table table table-dark table-striped table-hover">
-            <thead>
-                <tr>
-                    <th class="alignleft" data-sort="asc">Item</th>
-                    <th data-sort="asc">GE Price</th>
-                    <th data-sort="asc">Ely Price</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table> -->
+<nav class="navbar nav-pills fixed-top navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="https://dailyscape.github.io/img/dailyscape.png" alt="DailyScape - RS3 Dailies, Weeklies, Monthlies Task Checklist for RuneScape" width="24" height="24" class="d-inline-block align-text-top">
+            DailyScape
+        </a>
 
-        <table id="item_table" class="item_table table table-dark table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th class="alignleft" data-sort="asc">Item</th>
-                    <th data-sort="asc">GE Price</th>
-                    <th data-sort="asc">Ely Price</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <template id="sample_row">
-            <tr class="item_row" data-fav="false">
-                <td class="fav">
-                    <button class="fav-on fav-btn fa btn btn-secondary btn-sm active">★</button>
-                    <button class="fav-off fav-btn btn btn-secondary btn-sm active">☆</button>
-                </td>
-                <td class="item_name"></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </template>
+        <ul class="navbar-nav mr-auto nav-left">
+            <li class="nav-item active">
+                <a href="/" class="nav-link">← Return to Main Page</a>
+            </li>
+        </ul>
     </div>
+</nav>
+
+<div class="container-xl activity_tables">
+    <!-- <table id="favorite_table" class="item_table table table-dark table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="alignleft" data-sort="asc">Item</th>
+                <th data-sort="asc">GE Price</th>
+                <th data-sort="asc">Ely Price</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table> -->
+
+    <table id="item_table" class="item_table table table-dark table-striped table-hover">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th class="alignleft" data-sort="asc">Item</th>
+                <th data-sort="asc">GE Price</th>
+                <th data-sort="asc">Ely Price</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<template id="sample_row">
+    <tr class="item_row" data-fav="false">
+        <td class="fav">
+            <button class="fav-on fav-btn fa btn btn-secondary btn-sm active">★</button>
+            <button class="fav-off fav-btn btn btn-secondary btn-sm active">☆</button>
+            <!-- <button class="wikilink expanding_button btn btn-secondary btn-sm active">📖<span class="expanding_text">Wiki</span></button>
+            <button class="elylink expanding_button btn btn-secondary btn-sm active">📈<span class="expanding_text">Ely</span></button> -->
+        </td>
+        <td class="item_name"></td>
+        <td></td>
+        <td></td>
+    </tr>
+</template>
+
+<div id="tooltip" style="display:none; visibility: hidden;"></div>
+
+<footer>
+    <a href="https://github.com/dailyscape/dailyscape.github.io" target="_blank" rel="noopener noreferrer"><img src="https://dailyscape.github.io/img/github.png">Github</a>
+</footer>
+
 </body>
 </html>
