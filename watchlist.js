@@ -1,6 +1,36 @@
 const storage = window.localStorage;
 var combinedData = [];
 
+const defaultSort = function(a, b) {
+    if (a.constructor === Object) {
+        var afav = a.fav;
+        var aprice = a.price;
+        var aely = a.elyavgprice;
+        var bfav = b.fav;
+        var bprice = b.price;
+        var bely = b.elyavgprice;
+    } else {
+        var afav = a.dataset.fav;
+        var aprice = a.dataset.price;
+        var aely = a.dataset.elyprice;
+        var bfav = b.dataset.fav;
+        var bprice = b.dataset.price;
+        var bely = b.dataset.elyprice;
+    }
+
+    if (afav == 'true' && bfav == 'false') {
+        return -1;
+    } else if (bfav == 'true' && afav == 'false') {
+        return 1;
+    }
+
+    let sortPriceA = (aprice > 0 && aely > 0) ? aely : aprice;
+    let sortPriceB = (bprice > 0 && bely > 0) ? bely : bprice;
+    let sortSolution = sortPriceB - sortPriceA;
+
+    return sortSolution;
+}
+
 const combineSortData = function() {
     //combine
     for (let itemid in rsapidata) {
@@ -18,20 +48,7 @@ const combineSortData = function() {
     }
 
     //default sort - uses ely price or ge price
-    //@todo maybe account for old ely data too?
-    combinedData.sort((a, b) => {
-        if (a.fav == 'true' && b.fav == 'false') {
-            return -1;
-        } else if (b.fav == 'true' && a.fav == 'false') {
-            return 1;
-        }
-
-        let sortPriceA = (a.price > 0 && "elyavgprice" in a && a.elyavgprice > 0) ? a.elyavgprice : a.price;
-        let sortPriceB = (b.price > 0 && "elyavgprice" in b && b.elyavgprice > 0) ? b.elyavgprice : b.price;
-        let sortSolution = sortPriceB - sortPriceA;
-
-        return sortSolution;
-    });
+    combinedData.sort(defaultSort);
 }
 
 const getItems = function() {
@@ -53,6 +70,7 @@ const getItems = function() {
             }
 
             newRow.dataset.id = itemid;
+            newRow.dataset.price = item.price;
 
             let wikinamelink = item.name.toLowerCase().replace(/\s+/g, '_');
             wikinamelink = wikinamelink.charAt(0).toUpperCase() + wikinamelink.slice(1);
@@ -63,19 +81,20 @@ const getItems = function() {
             newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/rsdata/images/' + itemid + '.gif" ' + lazyloadHtml +'></a> ' + elyLink + item.name + '</a>';
 
             newRow.children[2].dataset.value = item.price;
-            newRow.children[2].innerHTML = item.price.toLocaleString() + '<span class="coin">●</span>';
+            newRow.children[2].innerHTML = '<span title="Change: ' + (item.price > item.last ? '+' : '') + (item.last != item.price ? (item.price - item.last).toLocaleString() : '') + '">' + item.price.toLocaleString() + (item.price > item.last ? '<span class="trend_positive">▲</span>' : item.price < item.last ? '<span class="trend_negative">▼</span>' : '<span class="coin">●</span>') + '</span>';
 
             if (itemid in rselydata && item.elyprices.length == 1 ) {
                 let dateThreshold=new Date();
                 dateThreshold.setMonth(dateThreshold.getMonth() - 2);
                 let dateTraded=new Date(item.elyprices[0].date);
-                let oldishPirce = item.elyprices[0].price;
-                newRow.children[3].dataset.value = oldishPirce;
+                let oldishPrice = item.elyprices[0].price;
+                newRow.children[3].dataset.value = oldishPrice;
                 if (dateTraded <= dateThreshold) {
-                    newRow.children[3].innerHTML = '<span class="oldish-price" title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="oldman">👴</span></span>';
+                    newRow.children[3].innerHTML = '<span class="oldish-price" title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPrice).toLocaleString() + '<span class="oldman">👴</span></span>';
                 } else {
-                    newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPirce).toLocaleString() + '<span class="coin">●</span></span>';
+                    newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPrice).toLocaleString() + '<span class="coin">●</span></span>';
                 }
+                newRow.dataset.elyprice = oldishPrice;
             } else if (itemid in rselydata && item.elyprices.length > 0) {
                 totalprice=0
                 for (let price of item.elyprices) {
@@ -84,6 +103,7 @@ const getItems = function() {
                 let avgprice=totalprice / item.elyprices.length;
                 newRow.children[3].dataset.value = avgprice;
                 newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
+                newRow.dataset.elyprice = avgprice;
             } else {
                 newRow.children[3].dataset.value = 0;
             }
@@ -107,7 +127,9 @@ const makeSortable = function() {
             let sortstate = this.dataset.sort;
 
             tableRows.sort((a, b) => {
-                if (columnindex == 1 && sortstate == 'asc') {
+                if (columnindex == 0) {
+                    return defaultSort(a, b);
+                } else if (columnindex == 1 && sortstate == 'asc') {
                     th.dataset.sort = 'desc';
                     return a.children[columnindex].innerHTML.localeCompare(b.children[columnindex].innerHTML)
                 } else if (columnindex == 1) {
