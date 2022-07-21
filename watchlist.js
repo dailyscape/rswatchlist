@@ -4,17 +4,17 @@ var combinedData = [];
 const defaultSort = function(a, b) {
     if (a.constructor === Object) {
         var afav = a.fav;
-        var aprice = a.price;
+        var aprice = a.price != null ? a.price : 0;
         var aely = a.elyavgprice;
         var bfav = b.fav;
-        var bprice = b.price;
+        var bprice = b.price != null ? b.price : 0;
         var bely = b.elyavgprice;
     } else {
         var afav = a.dataset.fav;
-        var aprice = a.dataset.price;
+        var aprice = a.dataset.price != 'null' ? a.dataset.price : 0;
         var aely = a.dataset.elyprice;
         var bfav = b.dataset.fav;
-        var bprice = b.dataset.price;
+        var bprice = b.dataset.price != 'null' ? b.dataset.price : 0;
         var bely = b.dataset.elyprice;
     }
 
@@ -33,8 +33,8 @@ const defaultSort = function(a, b) {
 
 const combineSortData = function() {
     //combine
-    for (let itemid in rsapidata) {
-        if (itemid in rselydata && rselydata[itemid].elyprices.length > 0) {
+    for (let itemid in rselydata) {
+        if (rselydata[itemid].elyprices.length > 0) {
             let totalprice=0
             for (let price of rselydata[itemid].elyprices) {
                 totalprice+=price.price
@@ -44,7 +44,12 @@ const combineSortData = function() {
 
         let isFav = storage.getItem('fav-' + itemid) ?? 'false';
 
-        combinedData.push(Object.assign({"id": itemid, "fav": isFav}, rsapidata[itemid], rselydata[itemid]));
+        if (itemid.startsWith("ely-")) {
+            //item is not mapped yet just show ely data
+            combinedData.push(Object.assign({"id": itemid, "fav": isFav, "islinked": false, "name": rselydata[itemid].elyname, "price": rselydata[itemid].elyavgprice}, rselydata[itemid]));
+        } else if (itemid in rsapidata) {
+            combinedData.push(Object.assign({"id": itemid, "fav": isFav, "islinked": true}, rsapidata[itemid], rselydata[itemid]));
+        }
     }
 
     //default sort - uses ely price or ge price
@@ -78,10 +83,19 @@ const getItems = function() {
             let elyLink = ('elyname' in item) ? '<a href="https://www.ely.gg/search?search_item=' + item.elyname + '" target="_blank" rel=\"noreferrer noopener\">' : '';
             let lazyloadHtml = (lazyloadCount > lazyloadAfter) ? ' loading="lazy"' : 'loading="eager"';
 
-            newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/rsdata/images/' + itemid + '.gif" ' + lazyloadHtml +'></a> ' + elyLink + item.name + '</a>';
+            if (item.islinked) {
+                newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/rsdata/images/' + itemid + '.gif" ' + lazyloadHtml +'></a> ' + elyLink + item.name + '</a>';
+            } else {
+                newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/img/dailyscape.png"></a> ' + elyLink + item.name + '</a>';
+            }
 
             newRow.children[2].dataset.value = item.price;
-            newRow.children[2].innerHTML = '<span title="Change: ' + (item.price > item.last ? '+' : '') + (item.last != item.price ? (item.price - item.last).toLocaleString() : '') + '">' + item.price.toLocaleString() + (item.price > item.last ? '<span class="trend_positive">▲</span>' : item.price < item.last ? '<span class="trend_negative">▼</span>' : '<span class="coin">●</span>') + '</span>';
+
+            if (!item.islinked) {
+                newRow.children[2].innerHTML = '';
+            } else if (item.price != null) {
+                newRow.children[2].innerHTML = '<span title="Change: ' + (item.price > item.last ? '+' : '') + (item.last != item.price ? (item.price - item.last).toLocaleString() : '') + '">' + item.price.toLocaleString() + (item.price > item.last ? '<span class="trend_positive">▲</span>' : item.price < item.last ? '<span class="trend_negative">▼</span>' : '<span class="coin">●</span>') + '</span>';
+            }
 
             if (itemid in rselydata && item.elyprices.length == 1 ) {
                 let dateThreshold=new Date();
