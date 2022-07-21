@@ -44,7 +44,7 @@ const combineSortData = function() {
 
         let isFav = storage.getItem('fav-' + itemid) ?? 'false';
 
-        if (itemid.startsWith("ely-")) {
+        if (itemid.startsWith("ely-") || !(itemid in rsapidata)) {
             //item is not mapped yet just show ely data
             combinedData.push(Object.assign({"id": itemid, "fav": isFav, "islinked": false, "name": rselydata[itemid].elyname, "price": rselydata[itemid].elyavgprice}, rselydata[itemid]));
         } else if (itemid in rsapidata) {
@@ -83,7 +83,7 @@ const getItems = function() {
             let elyLink = ('elyname' in item) ? '<a href="https://www.ely.gg/search?search_item=' + item.elyname + '" target="_blank" rel=\"noreferrer noopener\">' : '';
             let lazyloadHtml = (lazyloadCount > lazyloadAfter) ? ' loading="lazy"' : 'loading="eager"';
 
-            if (item.islinked) {
+            if (!itemid.startsWith("ely-")) {
                 newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/rsdata/images/' + itemid + '.gif" ' + lazyloadHtml +'></a> ' + elyLink + item.name + '</a>';
             } else {
                 newRow.children[1].innerHTML = wikiLink + '<img class="item_icon" src="/img/dailyscape.png"></a> ' + elyLink + item.name + '</a>';
