@@ -77,9 +77,7 @@ const getItems = function() {
             newRow.dataset.id = itemid;
             newRow.dataset.price = item.price;
 
-            let wikinamelink = item.name.toLowerCase().replace(/\s+/g, '_');
-            wikinamelink = wikinamelink.charAt(0).toUpperCase() + wikinamelink.slice(1);
-            wikiLink = '<a href="https://runescape.wiki/w/' + wikinamelink + '" target="_blank" rel=\"noreferrer noopener\">';
+            let wikiLink = '<a href="https://runescape.wiki/w/' + item.name.replace(/\s+/g, '_') + '" target="_blank" rel=\"noreferrer noopener\">';
             let elyLink = ('elyname' in item) ? '<a href="https://www.ely.gg/search?search_item=' + item.elyname + '" target="_blank" rel=\"noreferrer noopener\">' : '';
             let lazyloadHtml = (lazyloadCount > lazyloadAfter) ? ' loading="lazy"' : 'loading="eager"';
 
