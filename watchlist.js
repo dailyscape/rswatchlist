@@ -92,7 +92,8 @@ const getItems = function() {
             if (!item.islinked) {
                 newRow.children[2].innerHTML = '';
             } else if (item.price != null) {
-                newRow.children[2].innerHTML = '<span title="Change: ' + (item.price > item.last ? '+' : '') + (item.last != item.price ? (item.price - item.last).toLocaleString() : '') + '">' + item.price.toLocaleString() + (item.price > item.last ? '<span class="trend_positive">▲</span>' : item.price < item.last ? '<span class="trend_negative">▼</span>' : '<span class="coin">●</span>') + '</span>';
+                // newRow.children[2].innerHTML = '<span title="Change: ' + (item.price > item.last ? '+' : '') + (item.last != item.price ? (item.price - item.last).toLocaleString() : '') + '">' + item.price.toLocaleString() + (item.price > item.last ? '<span class="trend_positive">▲</span>' : item.price < item.last ? '<span class="trend_negative">▼</span>' : '<span class="coin">●</span>') + '</span>';
+                newRow.children[2].innerHTML = '<span>' + item.price.toLocaleString() + '<span class="coin">●</span></span>';
             }
 
             if (itemid in rselydata && item.elyprices.length == 1 ) {
