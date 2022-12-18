@@ -70,6 +70,14 @@ nav {
     top: -3px;
 }
 
+.spark_line {
+    vertical-align: bottom;
+}
+
+.spark_line canvas {
+    display: block;
+}
+
 .fav-btn {
     cursor: pointer;
     font-size:1rem;

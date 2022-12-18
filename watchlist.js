@@ -108,6 +108,7 @@ const getItems = function() {
                     newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPrice).toLocaleString() + '<span class="coin">●</span></span>';
                 }
                 newRow.dataset.elyprice = oldishPrice;
+                newRow.children[4].title = parseInt(oldishPrice).toLocaleString();
             } else if (itemid in rselydata && item.elyprices.length > 0) {
                 totalprice=0
                 for (let price of item.elyprices) {
@@ -117,6 +118,7 @@ const getItems = function() {
                 newRow.children[3].dataset.value = avgprice;
                 newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
                 newRow.dataset.elyprice = avgprice;
+                sparkLine(newRow.children[4], item.elyprices.reverse().map((price) => price.price));
             } else {
                 newRow.children[3].dataset.value = 0;
             }
@@ -179,6 +181,76 @@ const favEventListeners = function() {
                 storage.removeItem('fav-' + thisItemId);
             }
         });
+    }
+}
+
+/**
+ * An array of numbers goes in, either a canvas or a unicode sparkline comes out
+ * @param {*} element Element to apply sparkline to
+ * @param {Array[float]} dataSet Array of data to draw the sparkline of
+ * @returns null
+ */
+const sparkLine = function(element, dataSet) {
+    let max = Math.max(...dataSet);
+    let min = Math.min(...dataSet);
+
+    element.title = dataSet.map((price) => parseInt(price).toLocaleString()).join("\n");
+
+    if (min === max) {
+        return;
+    }
+
+    //Draw a sparkline using canvas
+    if (window.HTMLCanvasElement) {
+        let height = 32;
+        let width = 100;
+        let lineColor = 'rgba(255,255,255,1)';
+
+        //Create the canvas object
+        let canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        let context = canvas.getContext('2d');
+        context.strokeStyle = lineColor;
+
+        //Setup coordinates for line
+        let stepX = width / dataSet.length;
+        let stepY = (max - min) / height;
+        let x = 0;
+        let y = height - (dataSet[0] - min) / stepY; //starting point for the line
+
+        //Start drawing
+        context.clearRect(0, 0, width, height);
+        context.beginPath();
+        context.moveTo(x, y);
+
+        for (let element of dataSet) {
+            x = x + stepX;
+            y = height - (element - min) / stepY;
+            context.lineTo(x, y);
+        }
+
+        context.stroke();
+
+        element.appendChild(canvas);
+
+    //Unicode based sparkline if canvas is not available
+    } else {
+        let sparkElements = '▂▃▅▆▇'; //▁▄█ problematic vertical align on these chars
+
+        let step = (max - min) / sparkElements.length;
+        let output = '';
+
+        //loop through and determine which "step" the value lands in and add corresponding char to output
+        for (let element of dataSet) {
+            let sparkIndex = Math.floor((element - min) / step);
+            if (sparkIndex === sparkElements.length) {
+                sparkIndex--;
+            }
+            output += sparkElements[sparkIndex];
+        }
+
+        element.innerHTML = output;
     }
 }
 
