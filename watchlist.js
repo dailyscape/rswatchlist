@@ -101,15 +101,17 @@ const getItems = function() {
                 dateThreshold.setMonth(dateThreshold.getMonth() - 2);
                 let dateTraded=new Date(item.elyprices[0].date);
                 let oldishPrice = item.elyprices[0].price;
+                let oldPriceMessage = '';
                 newRow.children[3].dataset.value = oldishPrice;
                 if (dateTraded <= dateThreshold) {
+                    oldPriceMessage = "Last entry > 2 months ago:\n";
                     newRow.children[3].innerHTML = '<span class="oldish-price">' + parseInt(oldishPrice).toLocaleString() + '<span class="oldman">👴</span></span>';
                 } else {
                     newRow.children[3].innerHTML = '<span>' + parseInt(oldishPrice).toLocaleString() + '<span class="coin">●</span></span>';
                 }
                 newRow.dataset.elyprice = oldishPrice;
 
-                let priceHistory = `Last entry > 2 months ago:\n${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
+                let priceHistory = `${oldPriceMessage}${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
                 newRow.children[3].title = priceHistory;
                 newRow.children[4].title = priceHistory;
 
