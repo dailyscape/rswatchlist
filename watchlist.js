@@ -103,12 +103,16 @@ const getItems = function() {
                 let oldishPrice = item.elyprices[0].price;
                 newRow.children[3].dataset.value = oldishPrice;
                 if (dateTraded <= dateThreshold) {
-                    newRow.children[3].innerHTML = '<span class="oldish-price" title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPrice).toLocaleString() + '<span class="oldman">👴</span></span>';
+                    newRow.children[3].innerHTML = '<span class="oldish-price">' + parseInt(oldishPrice).toLocaleString() + '<span class="oldman">👴</span></span>';
                 } else {
-                    newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPrice).toLocaleString() + '<span class="coin">●</span></span>';
+                    newRow.children[3].innerHTML = '<span>' + parseInt(oldishPrice).toLocaleString() + '<span class="coin">●</span></span>';
                 }
                 newRow.dataset.elyprice = oldishPrice;
-                newRow.children[4].title = `${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
+
+                let priceHistory = `${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
+                newRow.children[3].title = priceHistory;
+                newRow.children[4].title = priceHistory;
+
             } else if (itemid in rselydata && item.elyprices.length > 0) {
                 totalprice=0
                 for (let price of item.elyprices) {
@@ -116,10 +120,13 @@ const getItems = function() {
                 }
                 let avgprice=totalprice / item.elyprices.length;
                 newRow.children[3].dataset.value = avgprice;
-                newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
+                newRow.children[3].innerHTML = '<span>' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
                 newRow.dataset.elyprice = avgprice;
+
                 sparkLine(newRow.children[4], item.elyprices.reverse().map((price) => price.price));
-                newRow.children[4].title = item.elyprices.reverse().map((price) => `${price.date} - ${parseInt(price.price).toLocaleString()}`).join("\n");
+                let priceHistory = item.elyprices.reverse().map((price) => `${price.date} - ${parseInt(price.price).toLocaleString()}`).join("\n");
+                newRow.children[3].title = priceHistory;
+                newRow.children[4].title = priceHistory;
             } else {
                 newRow.children[3].dataset.value = 0;
             }
