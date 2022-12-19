@@ -109,7 +109,7 @@ const getItems = function() {
                 }
                 newRow.dataset.elyprice = oldishPrice;
 
-                let priceHistory = `${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
+                let priceHistory = `Last entry > 2 months ago:\n${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
                 newRow.children[3].title = priceHistory;
                 newRow.children[4].title = priceHistory;
 
