@@ -108,7 +108,7 @@ const getItems = function() {
                     newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(oldishPrice).toLocaleString() + '<span class="coin">●</span></span>';
                 }
                 newRow.dataset.elyprice = oldishPrice;
-                newRow.children[4].title = parseInt(oldishPrice).toLocaleString();
+                newRow.children[4].title = `${item.elyprices[0].date} - ${parseInt(oldishPrice).toLocaleString()}`;
             } else if (itemid in rselydata && item.elyprices.length > 0) {
                 totalprice=0
                 for (let price of item.elyprices) {
@@ -119,6 +119,7 @@ const getItems = function() {
                 newRow.children[3].innerHTML = '<span title="Last Entry: ' + item.elyprices[0].date + '">' + parseInt(avgprice).toLocaleString() + '<span class="coin">●</span></span>';
                 newRow.dataset.elyprice = avgprice;
                 sparkLine(newRow.children[4], item.elyprices.reverse().map((price) => price.price));
+                newRow.children[4].title = item.elyprices.reverse().map((price) => `${price.date} - ${parseInt(price.price).toLocaleString()}`).join("\n");
             } else {
                 newRow.children[3].dataset.value = 0;
             }
@@ -193,8 +194,6 @@ const favEventListeners = function() {
 const sparkLine = function(element, dataSet) {
     let max = Math.max(...dataSet);
     let min = Math.min(...dataSet);
-
-    element.title = dataSet.map((price) => parseInt(price).toLocaleString()).join("\n");
 
     if (min === max) {
         return;
