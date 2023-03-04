@@ -65,7 +65,9 @@ const getItems = function() {
     for (let item of combinedData) {
         let itemid = item.id;
 
-        if ('price' in item || ('elyprices' in item && item.elyprices.length > 0)) {
+        if ( item.name.startsWith('Inverted')) {
+            console.log(`Skipping: ${item.name}`);
+        } else if ('price' in item || ('elyprices' in item && item.elyprices.length > 0)) {
             let rowClone = sampleRow.content.cloneNode(true);
             let newRow = rowClone.querySelector('tr');
 
